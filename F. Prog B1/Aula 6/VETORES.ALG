@@ -26,7 +26,7 @@ Var
 //nome do vetor : vetor[(inicio)..(fim)] de (tipo de variavel)
 vNotas : vetor[1..5] de inteiro
 //LEMBRE DOS DOIS PONTOS
-
+x : inteiro
 
 
 Inicio
@@ -34,6 +34,18 @@ Inicio
 //nome do vetor [indice] : valor
 vNotas[1] := 5
 escreval(vNotas[1])
+
+
+//É possivel usar variaveis na hora de escrever o indice
+vNotas[2] := 3
+x := 2
+escreval(vNotas[x])
+
+//É possivel usar leia com vetores
+escreval("Digite uma nota")
+leia(vNotas[3])
+escreval(vNotas[3])
+
 
 
 Fimalgoritmo
