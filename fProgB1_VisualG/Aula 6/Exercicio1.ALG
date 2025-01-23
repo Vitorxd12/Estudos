@@ -1,11 +1,12 @@
 Algoritmo "semnome"
-// Disciplina   : [Fundamentos da progamaï¿½ï¿½o]
+// Disciplina   : [Fundamentos da progamação]
 // Professor   : Telmo Oliveira
 // Autor(a)    : Vitor Oliveira Costa Dias
 // Data atual  : 23/01/2025
 
-//Gere um vetor (v) de de 5 numeros atï¿½ 20
+//Gere um vetor (v) de de 5 numeros até 20
 //Ache o menor numero de V
+//Crie um vetor M, e preencha-o com com a multriplicação do menor valor de v
 Var
    v, m : vetor[1..5] de inteiro
    constante, i, mNum: inteiro
@@ -23,9 +24,9 @@ Inicio
       fimse
       escreva(v[i]:5)
    fimpara
-   escreval("Menor nï¿½mero em V: ", mNum)
+   escreval("Menor número em V: ", mNum)
    
-   escreval("Valores de V * Menor nï¿½mero")
+   escreval("Valores de V * Menor número")
    para i de 1 ate constante faca
       m[i] := v[i] * mNum
       escreva(m[i]:5)
