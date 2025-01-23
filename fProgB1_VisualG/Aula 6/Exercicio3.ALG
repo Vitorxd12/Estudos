@@ -18,11 +18,11 @@ Algoritmo "semnome"
 //Média: 9.1
 Var
    vNotas, vNotasValidas : vetor[1..7] de real
-   media, maiorNota, menorNota : real
+   media, maiorNota, menorNota, soma : real
    c, nJurados : inteiro
 
 Inicio
-   nJurados := 3
+   nJurados := 7
    maiorNota := 0
    menorNota := 0
 
@@ -35,14 +35,20 @@ Inicio
       se (vNotas[c] > maiorNota) entao
          maiorNota := vNotas[c]
       fimse
-      escreval(maiorNota, menorNota)
    fimpara
-   
+   escreval()
+   escreval("A maior nota foi: ", maiorNota)
+   escreval("A menor nota foi: ", menorNota)
+   escreval("Notas válidas: ")
    para c de 1 ate nJurados faca
-       se (vNotas[c] = maiorNota) ou (vNotas[c] = menorNota) entao
-
-       fimse
+      se (vNotas[c] = maiorNota) ou (vNotas[c] = menorNota) entao
+      senao
+           vNotasValidas[c] := vNotas[c]
+           escreva(vNotasValidas[c]:4:1)
+           soma := soma + vNotasValidas[c]
+      fimse
    fimpara
-
+   escreval()
+   escreval("A média de todas as notas válidas foi: ", soma/(c-2))
 
 Fimalgoritmo
