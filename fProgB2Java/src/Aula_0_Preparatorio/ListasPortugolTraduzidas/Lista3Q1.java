@@ -6,6 +6,7 @@ import java.util.Scanner;
 //Este programa deverá calcular e mostrar: o percentual de pessoas com altura
 //menor ou igual 1.70 e o percentual com altura maior que 1.70. Finalize a
 //leitura de dados com uma altura negativa.
+
 public class Lista3Q1 {
     public static void main(String[] args) {
 
