@@ -1,4 +1,4 @@
-package Aula_0_Preparatorio.ListasPortugolTraduzidas;
+package TranslatedOldExercises;
 
 import java.util.Scanner;
 

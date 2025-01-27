@@ -1,4 +1,4 @@
-package Aula_0_Preparatorio;
+package firstSteps;
 //when we create a java file, we need to create a class with the same nas as the file.
 //every jva file is hard writen with its class, but it is also possible to create another class in between them
 //those classes on witch the name of the file is based on are called public, and it can only be one public class par file. that's we name it: "public class HelloWorld {}"

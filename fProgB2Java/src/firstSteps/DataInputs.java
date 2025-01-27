@@ -1,4 +1,4 @@
-package Aula_0_Preparatorio;
+package firstSteps;
 
 import java.util.Scanner;
 

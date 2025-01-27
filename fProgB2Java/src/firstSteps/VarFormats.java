@@ -1,4 +1,4 @@
-package Aula_0_Preparatorio;
+package firstSteps;
 
 public class VarFormats {
     public static void main(String[] args) {

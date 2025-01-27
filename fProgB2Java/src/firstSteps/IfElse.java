@@ -1,4 +1,4 @@
-package Aula_0_Preparatorio;
+package firstSteps;
 
 public class IfElse {
     public static void main(String[] args) {
