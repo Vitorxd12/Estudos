@@ -1,4 +1,4 @@
-package TranslatedOldExercises;
+package ListaExercicios4;
 /*
 01 - Construa um programa que gere e armazene em um vetor V 30 valores inteiros não negativos
 (até 50). Depois que o vetor for preenchido, o programa deve pedir para o usuário informar um

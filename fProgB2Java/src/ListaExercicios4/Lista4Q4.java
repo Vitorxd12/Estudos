@@ -1,4 +1,4 @@
-package TranslatedOldExercises;
+package ListaExercicios4;
 import java.util.Random;
 
 /*04 - Leia a idade de 10 alunos e armazene em um vetor V. A seguir, crie 04 vetores:

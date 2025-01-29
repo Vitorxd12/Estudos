@@ -1,4 +1,4 @@
-package TranslatedOldExercises;
+package ListaExercicios4;
 import java.util.Scanner;
 
 /*02 - Construa um programa que leia um número entre 1000 e 9999. A seguir, adicione em um
