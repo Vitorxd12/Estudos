@@ -9,7 +9,7 @@ public class DataInputs {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("sup dog whats your name");
-        String name = scanner.nextLine();
+        String name = scanner.nextLine(); //criando o objeto sc na classe Scanner da biblioteca .util.Scanner
         System.out.println("Hello " + name);
     }
 }
