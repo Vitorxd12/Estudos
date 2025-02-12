@@ -1,5 +1,7 @@
 package Challanges;
+
 import java.util.Scanner;
+
 /*
 Exercício: Gerenciamento de Estoque de Produtos
 
@@ -127,8 +129,9 @@ public class WareHouse {
                 System.out.println("Não há esta quantidade de produtos em estoque!");
                 i = i - 1;
             } else { //rezerva
-                System.out.println("O produto " + vNom[i] + " foi rezervado com sucesso!\n" + "Foram subtraidas " + num + " undidades do produto, restando " + (vQtd[i] - num) + " no estoque."  );
+                System.out.println("O produto " + vNom[i] + " foi rezervado com sucesso!\n" + "Foram subtraidas " + num + " undidades do produto, restando " + (vQtd[i] - num) + " no estoque.");
                 vQtd[i] = vQtd[i] - num;
+                break;
             }
         }
         System.out.println("Aperte enter para voltar ao menu.");
@@ -184,7 +187,8 @@ public class WareHouse {
                 System.out.println("Custo com " + vNom[i] + ": " + vVal[i] * vQtd[i] + "R$");
                 total += vVal[i] * vQtd[i];
             }
-        } System.out.println("Total de todos os produtos: " + total);
+        }
+        System.out.println("Total de todos os produtos: " + total);
         System.out.println("Aperte enter para voltar ao menu.");
         sc.nextLine();
     }
