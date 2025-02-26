@@ -17,7 +17,7 @@ public class q2 {
             for (int j = 0; j < mSize; j++) {
                 matrix[i][j] = rand.nextInt(20);
                 if (matrix[i][j] < 10) System.out.print("0");
-                System.out.print(matrix[i][j] + "  ");
+                System.out.print(matrix[i][j] + "\t");
             }
             System.out.println();
         }
