@@ -70,20 +70,20 @@ public class q7 {
         System.out.println("Número de multas radar 2: " + nMultasRad2);
         System.out.println("Número de multas em alagoas: " + nMultasAL);
 
-        System.out.println("Velocidade media de cada carro:");
+        System.out.println("\nVelocidade media de cada carro:");
         for (int i = 0; i < vMedVelCar.length; i++) {
             System.out.print("Carro " + (i + 1) + ": " + String.format("%.2f", vMedVelCar[i]) + "\t");
         }
 
-        System.out.println();
-        System.out.println("Porcentagem de multas caputadas por radar");
+
+        System.out.println("\n\nPorcentagem de multas caputadas por radar");
         //Converter soma das multas dos radares em  porcentagens e imprimir
         for (int i = 0; i < vPerCarRadar.length; i++) {
             vPerCarRadar[i] = (vPerCarRadar[i] * 100) / nCarros;
             System.out.print("Radar " + (i + 1) + ": " + String.format("%.2f",vPerCarRadar[i]) + "%\t");
         }
-        System.out.println();
-        System.out.println("Velocidade media capturada por cada radar:");
+
+        System.out.println("\n\nVelocidade media capturada por cada radar:");
         for (int i = 0; i < vMedVelRad.length; i++) {
             vMedVelRad[i] = vMedVelRad[i] / nCarros;
             System.out.print("Radar " + (i + 1) + ": " + String.format("%.2f",vMedVelRad[i]) + "\t");
