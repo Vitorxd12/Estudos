@@ -23,17 +23,9 @@ public class Aluno {
             System.out.println("erro na hora de definir a matricula");
         }
     }
-    public void setNotaFinal(String login, String senha, double nota){
-        HashMap<String, String> prof = new HashMap<>();
-
-        prof.put("Prof. Ana", "ana123");
-        prof.put("Prof. Pedro", "pedro123");
-
-        if (prof.get(login).equals(senha)) {
+    //ja foi autenticado, não ha a necessidade de mandar o login e a senha por aaqui
+    public void setNotaFinal(double nota){
             this.notaFinal = nota;
-        } else {
-            System.out.println("Login ou senha incorretos");
-        }
     }
 
     public void getStatus(String senha){
