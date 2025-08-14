@@ -1,0 +1,1297 @@
+
+Você disse:
+🧠 Simulador de Pipeline RISC
+
+Usando como base o modelo de instrução RISC, é proposto a criação de um simulador de pipeline em 5 estágios. O trabalho deve observar as características gerais do modelo, seguir o padrão de processamento e respeitar as diretrizes de cada estágio. Características gerais do projeto serão descritas a seguir.
+📌 Visão geral do Projeto
+
+    O simulador deve ser feito em Java.
+    O conteúdo da memória deve ser carregado a partir de um arquivo.
+    O conteúdo dos registradores deve ser carregado a partir de um arquivo.
+    As instruções devem ser carregadas a partir de um arquivo.
+
+⚙️ Operadores Principais
+
+    ADD – Soma valores e salva em um registrador
+    Exemplo: add r0 r1 r2
+
+    SUB – Subtrai valores e salva em um registrador
+    Exemplo: sub r0 r1 r2
+
+    LW – Carrega o conteúdo de uma memória em um registrador
+    Exemplo: lw rs2, offset(rs1)
+
+    SW – Armazena o conteúdo do registrador em uma memória
+    Exemplo: sw rs2, offset(rs1)
+
+🚧 Operadores Desafio
+
+SWAP – Troca os valores dos registradores
+Exemplo: swap r0 r1
+
+AVG – Calcula a média entre dois registradores
+Exemplo: avg r0 r1 r2
+
+REV – Reverte a ordem dos bits do registrador
+Exemplo: rev r0 r1
+Considerando que são armazenados inteiros de 32 bits em cadeias de 8 bits cada.
+
+Entrada:
+  00000000 00000000 00000000 00001001
+  00000000 00000000 00000000 00001111
+  00000000 00000000 00000000 10000000
+  00000000 00000000 00000000 00000001
+  11100000 00000000 00000000 00000000
+
+Saída:
+  10010000 00000000 00000000 00000000
+  11110000 00000000 00000000 00000000
+  00000001 00000000 00000000 00000000
+  10000000 00000000 00000000 00000000
+  00000000 00000000 00000000 00000111
+
+🧩 Visão geral dos componentes
+Simulador.java
+
+Classe central que gerencia o fluxo entre os estágios do pipeline. Responsável por inicializar, avançar os ciclos, controlar os registradores entre estágios e coletar estatísticas.
+Estágios (Stages)
+
+Cada estágio (IF, ID, EX, MEM, WB) tem sua lógica encapsulada em uma classe ou método próprio, recebendo e repassando informações para o próximo estágio.
+
+    IF – Instruction Fetch
+    ID – Instruction Decode
+    EX – Execute
+    MEM – Memory Access
+    WB – Write Back
+
+Main.java
+
+Ponto de entrada do programa. Inicializa o simulador e simula a execução de instruções com base em um arquivo carregado.
+📝 Notas importantes
+
+    Um Parser deve ser usado pelo simulador para inicializar a lista de instruções.
+    Os arquivos com instruções, memória e registradores estão no repositório.
+    O trabalho deve ser feito em grupo.
+
+📅 Prazo
+
+Entrega até 27/08
+O ChatGPT disse:
+
+Legal! Você está montando um simulador de pipeline RISC de 5 estágios em Java, com suporte para instruções comuns como ADD, SUB, LW, SW, além de instruções desafiadoras como SWAP, AVG e REV. Vamos organizar isso para facilitar sua implementação, passo a passo.
+✅ Estrutura Geral do Projeto
+
+RiscPipelineSimulator/
+│
+├── Main.java
+├── Simulador.java
+├── parser/
+│   └── Parser.java
+├── stages/
+│   ├── IF.java
+│   ├── ID.java
+│   ├── EX.java
+│   ├── MEM.java
+│   └── WB.java
+├── model/
+│   ├── Instruction.java
+│   ├── RegisterFile.java
+│   └── Memory.java
+├── input/
+│   ├── instructions.txt
+│   ├── memory.txt
+│   └── registers.txt
+└── utils/
+    └── BitUtils.java
+
+⚙️ Estágios do Pipeline
+
+    IF (Instruction Fetch)
+
+        Busca a próxima instrução com base no PC (Program Counter).
+
+    ID (Instruction Decode)
+
+        Decodifica a instrução e lê os registradores de origem.
+
+    EX (Execute)
+
+        Executa a operação aritmética/lógica.
+
+        Calcula endereço para LW/SW.
+
+    MEM (Memory Access)
+
+        Acessa memória se for LW/SW.
+
+        SW escreve memória. LW lê memória.
+
+    WB (Write Back)
+
+        Escreve resultado no registrador destino (se necessário).
+
+🧠 Instruções e Seus Formatos
+Instrução	Formato	Operação
+ADD	add rd rs1 rs2	rd = rs1 + rs2
+SUB	sub rd rs1 rs2	rd = rs1 - rs2
+LW	lw rd offset(rs1)	rd = Mem[rs1 + offset]
+SW	sw rs2 offset(rs1)	Mem[rs1 + offset] = rs2
+SWAP	swap rd rs1	Troca rd com rs1
+AVG	avg rd rs1 rs2	Média inteira: (rs1 + rs2) / 2
+REV	rev rd rs1	Reverte os bits de 32 bits de rs1 → rd
+🧾 Entrada e Saída
+Formato dos arquivos:
+
+    instructions.txt (1 instrução por linha)
+
+add r0 r1 r2
+sub r3 r1 r0
+lw r2 4(r1)
+sw r3 8(r0)
+rev r4 r3
+
+    registers.txt
+    Cada linha: registrador em decimal
+
+9
+15
+128
+1
+3758096384
+
+    memory.txt
+    Cada linha: valor de 32 bits
+
+0
+0
+0
+0
+0
+
+🧰 Classes Principais (Resumo)
+Instruction.java
+
+public class Instruction {
+    public String opcode;
+    public String rd, rs1, rs2;
+    public int offset;
+
+    public Instruction(String opcode, String rd, String rs1, String rs2, int offset) {
+        this.opcode = opcode;
+        this.rd = rd;
+        this.rs1 = rs1;
+        this.rs2 = rs2;
+        this.offset = offset;
+    }
+
+    public static Instruction parse(String line) {
+        // Implementar parsing por tipo de instrução
+    }
+}
+
+Simulador.java
+
+public class Simulador {
+    private List<Instruction> instructionMemory;
+    private RegisterFile registers;
+    private Memory memory;
+    private int pc;
+
+    private IF ifStage;
+    private ID idStage;
+    private EX exStage;
+    private MEM memStage;
+    private WB wbStage;
+
+    public void carregarArquivos(String instrPath, String memPath, String regPath) {
+        // Use Parser para carregar arquivos
+    }
+
+    public void iniciarSimulacao() {
+        while (!todasInstrucoesConcluidas()) {
+            wbStage.executar();
+            memStage.executar();
+            exStage.executar();
+            idStage.executar();
+            ifStage.executar();
+        }
+    }
+}
+
+BitUtils.java
+
+public class BitUtils {
+    public static int reverseBits(int value) {
+        int result = 0;
+        for (int i = 0; i < 32; i++) {
+            result <<= 1;
+            result |= (value >> i) & 1;
+        }
+        return result;
+    }
+}
+
+Main.java
+
+public class Main {
+    public static void main(String[] args) {
+        Simulador sim = new Simulador();
+        sim.carregarArquivos("input/instructions.txt", "input/memory.txt", "input/registers.txt");
+        sim.iniciarSimulacao();
+    }
+}
+
+🧪 Exemplos de Implementação dos Estágios
+EX.java (trecho)
+
+public class EX {
+    public void executar(Instruction instr) {
+        switch (instr.opcode) {
+            case "add":
+                result = reg.read(instr.rs1) + reg.read(instr.rs2);
+                break;
+            case "avg":
+                result = (reg.read(instr.rs1) + reg.read(instr.rs2)) / 2;
+                break;
+            case "rev":
+                result = BitUtils.reverseBits(reg.read(instr.rs1));
+                break;
+            // etc.
+        }
+    }
+}
+
+✅ Progresso Ideal por Etapas
+Etapa	Tarefa
+✅ Semana 1 (até 18/08)	Criar estrutura básica, parser e classes modelo
+🟡 Semana 2 (até 24/08)	Implementar estágios IF → WB, incluindo instruções principais
+⏳ Semana 3 (até 27/08)	Instruções desafiadoras, testes e finalização do simulador
+
+Se quiser, posso te ajudar a escrever os arquivos de entrada, código do parser ou as classes dos estágios. Deseja começar por alguma parte específica?
+Você disse:
+como funciona a dinamica entre a memoria e o registrador? qual a diferença entre eles
+O ChatGPT disse:
+
+Ótima pergunta! Entender a diferença entre memória e registradores é essencial para simular (e entender) um processador com arquitetura RISC e pipeline.
+🧠 Conceito Básico
+Componente	O que é?
+Registradores	Pequenas áreas de armazenamento dentro da CPU. Muito rápidas.
+Memória (RAM)	Grande área de armazenamento fora da CPU, usada para dados e código.
+⚙️ Diferenças principais
+Característica	Registradores	Memória RAM
+Velocidade	Extremamente rápida	Mais lenta que registradores
+Capacidade	Muito pequena (tipicamente 32 ou 64)	Muito maior (MBs ou GBs)
+Localização	Dentro do processador	Fora do processador (na RAM)
+Acesso	Direto pela CPU	Requer cálculo de endereço
+Uso típico	Dados temporários, operandos, resultados	Dados permanentes, variáveis, arrays
+Identificação	Nomes como r0, r1, r2, ...	Endereços como 0x1000, 0x1004
+🔄 Como eles interagem?
+
+No ciclo de execução de instruções, registradores e memória se complementam:
+Exemplo de ciclo completo:
+
+    Carregar dados da memória para registradores (LW)
+
+lw r1, 0(r2)
+
+    Interpretação: carregar o valor da memória no endereço contido em r2 + 0 para o registrador r1.
+
+Operar com dados nos registradores (ADD, SUB, etc.)
+
+add r3, r1, r4
+
+    Interpretação: somar r1 com r4 e guardar o resultado em r3.
+
+Armazenar resultados de volta na memória (SW)
+
+    sw r3, 4(r2)
+
+        Interpretação: armazenar o valor de r3 na memória no endereço r2 + 4.
+
+📦 Analogia simples
+
+Pense em um escritório:
+
+    Registradores = Bloco de notas na sua mão (rápido acesso, pouca informação).
+
+    Memória RAM = Arquivo do armário (mais lento, mas com muita informação).
+
+    Quando você quer fazer cálculos, tira uma folha do armário (memória), anota no bloco (registrador), faz o cálculo, e guarda o resultado de volta no armário (memória).
+
+📌 Na sua simulação
+
+    A classe RegisterFile pode ser um vetor de inteiros: int[] registers = new int[32];
+
+    A classe Memory pode ser um Map<Integer, Integer> ou int[] memory = new int[1024];
+
+Você acessará assim:
+
+// Registradores
+int valorR1 = registers[1];
+registers[3] = valorR1 + 5;
+
+// Memória
+int endereco = registers[2] + 4;
+int dado = memory[endereco];
+memory[endereco] = registers[3];
+
+Se quiser, posso te ajudar a implementar as classes RegisterFile e Memory. Quer seguir por essa parte agora?
+Você disse:
+me ajude a entender o parser
+O ChatGPT disse:
+
+Claro! O parser é a peça do seu simulador que lê os arquivos de entrada (instruções, registradores, memória) e converte esses dados em estruturas que o programa consegue entender e manipular — como objetos Java (Instruction, RegisterFile, etc.).
+
+Vamos focar primeiro no parser de instruções, que é o mais desafiador por causa dos diferentes formatos de instrução.
+🧠 O que o Parser precisa fazer?
+
+    Ler o arquivo instructions.txt linha por linha
+
+    Identificar o tipo de instrução (ex: add, sub, lw, sw, etc.)
+
+    Separar os operandos (registradores, offset, etc.)
+
+    Criar um objeto Instruction com os dados corretos
+
+    Devolver uma lista de instruções para o simulador usar
+
+📄 Exemplo de instructions.txt
+
+add r1 r2 r3
+sub r4 r1 r0
+lw r5 4(r1)
+sw r6 8(r2)
+avg r7 r1 r3
+rev r8 r2
+
+🧱 Modelo da Classe Instruction
+
+public class Instruction {
+    public String opcode;
+    public String rd;
+    public String rs1;
+    public String rs2;
+    public int offset; // usado para lw/sw
+
+    public Instruction(String opcode, String rd, String rs1, String rs2, int offset) {
+        this.opcode = opcode;
+        this.rd = rd;
+        this.rs1 = rs1;
+        this.rs2 = rs2;
+        this.offset = offset;
+    }
+
+    @Override
+    public String toString() {
+        return opcode + " " + rd + " " + rs1 + " " + rs2 + " offset=" + offset;
+    }
+}
+
+🧪 Exemplo de Classe Parser.java
+
+import java.io.*;
+import java.util.*;
+
+public class Parser {
+
+    public static List<Instruction> parseInstructions(String filePath) throws IOException {
+        List<Instruction> instructions = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            line = line.trim();
+
+            if (line.isEmpty() || line.startsWith("#")) continue; // ignora comentários e linhas vazias
+
+            String[] parts = line.split("\\s+");
+            String opcode = parts[0];
+
+            switch (opcode) {
+                case "add":
+                case "sub":
+                case "avg":
+                    // Formato: opcode rd rs1 rs2
+                    instructions.add(new Instruction(opcode, parts[1], parts[2], parts[3], 0));
+                    break;
+
+                case "rev":
+                case "swap":
+                    // Formato: opcode rd rs1
+                    instructions.add(new Instruction(opcode, parts[1], parts[2], null, 0));
+                    break;
+
+                case "lw":
+                case "sw":
+                    // Formato: opcode rs2 offset(rs1)
+                    String rdOrRs2 = parts[1];
+                    String offsetAndRs1 = parts[2];
+
+                    int openParen = offsetAndRs1.indexOf('(');
+                    int closeParen = offsetAndRs1.indexOf(')');
+                    int offset = Integer.parseInt(offsetAndRs1.substring(0, openParen));
+                    String rs1 = offsetAndRs1.substring(openParen + 1, closeParen);
+
+                    if (opcode.equals("lw")) {
+                        instructions.add(new Instruction(opcode, rdOrRs2, rs1, null, offset));
+                    } else { // sw
+                        instructions.add(new Instruction(opcode, null, rs1, rdOrRs2, offset));
+                    }
+                    break;
+
+                default:
+                    throw new IllegalArgumentException("Instrução inválida: " + opcode);
+            }
+        }
+
+        reader.close();
+        return instructions;
+    }
+}
+
+✅ Resultado esperado
+
+Se você rodar isso com o exemplo do instructions.txt, o parser vai gerar uma lista de objetos Instruction, como:
+
+Instruction("add", "r1", "r2", "r3", 0)
+Instruction("sub", "r4", "r1", "r0", 0)
+Instruction("lw", "r5", "r1", null, 4)
+Instruction("sw", null, "r2", "r6", 8)
+Instruction("avg", "r7", "r1", "r3", 0)
+Instruction("rev", "r8", "r2", null, 0)
+
+⚙️ Como usar no Simulador
+
+Dentro de Simulador.java:
+
+this.instructionMemory = Parser.parseInstructions("input/instructions.txt");
+
+❓Quer continuar?
+
+    Quer que eu te ajude a fazer o parser de registradores e memória também?
+
+    Ou prefere seguir com a execução das instruções agora que o parser está pronto?
+
+Você disse:
+é possivel fazer sem parser e ser as classes da pasta model? não planjeo fazer os operadores desafio. memoria é apenas um vetor, assim como o registrador. ler os arquivos pode ser função do main
+O ChatGPT disse:
+
+Sim, absolutamente possível fazer sem uma classe Parser dedicada, principalmente se você quer manter o projeto mais simples e não vai implementar os operadores desafio.
+
+Você pode centralizar a leitura dos arquivos no Main.java e passar os dados já prontos para o Simulador. A função do parser é só organizar a leitura dos arquivos — não é obrigatória. Isso simplifica bastante a arquitetura e ainda cumpre os requisitos do trabalho.
+✅ Estrutura simplificada (sem parser)
+
+Você pode fazer algo assim:
+📁 Pasta model/
+
+    Instruction.java → Representa uma instrução RISC
+
+    RegisterFile.java → Um array de inteiros (registradores)
+
+    Memory.java → Um array de inteiros (memória principal)
+
+📄 Instruction.java
+
+public class Instruction {
+    public String opcode;
+    public int rd;
+    public int rs1;
+    public int rs2;
+    public int offset;
+
+    public Instruction(String opcode, int rd, int rs1, int rs2, int offset) {
+        this.opcode = opcode;
+        this.rd = rd;
+        this.rs1 = rs1;
+        this.rs2 = rs2;
+        this.offset = offset;
+    }
+}
+
+📄 RegisterFile.java
+
+public class RegisterFile {
+    public int[] registers;
+
+    public RegisterFile(int numRegs) {
+        registers = new int[numRegs];
+    }
+
+    public int get(int index) {
+        return registers[index];
+    }
+
+    public void set(int index, int value) {
+        registers[index] = value;
+    }
+}
+
+📄 Memory.java
+
+public class Memory {
+    public int[] memory;
+
+    public Memory(int size) {
+        memory = new int[size];
+    }
+
+    public int load(int address) {
+        return memory[address];
+    }
+
+    public void store(int address, int value) {
+        memory[address] = value;
+    }
+}
+
+📄 Main.java (fazendo leitura dos arquivos)
+
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        List<Instruction> instructions = new ArrayList<>();
+
+        // Lê instruções
+        BufferedReader instrReader = new BufferedReader(new FileReader("input/instructions.txt"));
+        String line;
+        while ((line = instrReader.readLine()) != null) {
+            String[] parts = line.trim().split("\\s+");
+            String opcode = parts[0];
+            int rd = 0, rs1 = 0, rs2 = 0, offset = 0;
+
+            switch (opcode) {
+                case "add":
+                case "sub":
+                    rd = Integer.parseInt(parts[1].substring(1));
+                    rs1 = Integer.parseInt(parts[2].substring(1));
+                    rs2 = Integer.parseInt(parts[3].substring(1));
+                    break;
+
+                case "lw":
+                    rd = Integer.parseInt(parts[1].substring(1));
+                    String[] lwParts = parts[2].split("[()]");
+                    offset = Integer.parseInt(lwParts[0]);
+                    rs1 = Integer.parseInt(lwParts[1].substring(1));
+                    break;
+
+                case "sw":
+                    rs2 = Integer.parseInt(parts[1].substring(1));
+                    String[] swParts = parts
+
+Você disse:
+eu quis dizer SEM as classes da pasta models
+O ChatGPT disse:
+
+Sim, é totalmente possível fazer o simulador sem usar classes extras como Instruction, Memory ou RegisterFile, e sem criar um parser dedicado. Você pode manter o projeto mais simples e direto, concentrando toda a lógica no Main.java e no Simulador.java, usando vetores e strings para representar registradores, memória e instruções.
+✅ O que muda com essa abordagem?
+Item	Abordagem com model	Abordagem simples (sem model/parser)
+Instruções	Objetos Instruction	Linhas de texto (String[])
+Registradores	Objeto RegisterFile	Vetor int[] registradores
+Memória	Objeto Memory	Vetor int[] memoria
+Parser	Classe separada	Leitura direta no main()
+🧠 Estrutura Simples Recomendada
+
+RiscPipelineSimulator/
+├── Main.java
+├── Simulador.java
+├── Estagios/
+│   ├── IF.java
+│   ├── ID.java
+│   ├── EX.java
+│   ├── MEM.java
+│   └── WB.java
+└── input/
+    ├── instructions.txt
+    ├── memory.txt
+    └── registers.txt
+
+📥 Exemplo de Main.java (sem model, sem parser)
+
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) throws IOException {
+        // Leitura dos arquivos direto no Main
+        List<String> instrucoes = lerArquivo("input/instructions.txt");
+        int[] registradores = lerInteiros("input/registers.txt");
+        int[] memoria = lerInteiros("input/memory.txt");
+
+        // Inicia o simulador com vetores puros
+        Simulador simulador = new Simulador(instrucoes, registradores, memoria);
+        simulador.executar();
+    }
+
+    public static List<String> lerArquivo(String caminho) throws IOException {
+        return Files.readAllLines(new File(caminho).toPath());
+    }
+
+    public static int[] lerInteiros(String caminho) throws IOException {
+        List<String> linhas = lerArquivo(caminho);
+        int[] dados = new int[linhas.size()];
+        for (int i = 0; i < linhas.size(); i++) {
+            dados[i] = Integer.parseUnsignedInt(linhas.get(i).trim());
+        }
+        return dados;
+    }
+}
+
+🧠 Exemplo de Simulador.java simplificado
+
+import java.util.*;
+
+public class Simulador {
+    private List<String> instrucoes;
+    private int[] registradores;
+    private int[] memoria;
+    private int pc = 0;
+
+    public Simulador(List<String> instrucoes, int[] registradores, int[] memoria) {
+        this.instrucoes = instrucoes;
+        this.registradores = registradores;
+        this.memoria = memoria;
+    }
+
+    public void executar() {
+        while (pc < instrucoes.size()) {
+            String linha = instrucoes.get(pc).trim();
+            if (linha.isEmpty()) {
+                pc++;
+                continue;
+            }
+
+            String[] partes = linha.split("\\s+");
+            String op = partes[0];
+
+            switch (op) {
+                case "add": {
+                    int rd = getNum(partes[1]);
+                    int rs1 = getNum(partes[2]);
+                    int rs2 = getNum(partes[3]);
+                    registradores[rd] = registradores[rs1] + registradores[rs2];
+                    break;
+                }
+                case "sub": {
+                    int rd = getNum(partes[1]);
+                    int rs1 = getNum(partes[2]);
+                    int rs2 = getNum(partes[3]);
+                    registradores[rd] = registradores[rs1] - registradores[rs2];
+                    break;
+                }
+                case "lw": {
+                    int rd = getNum(partes[1]);
+                    int offset = Integer.parseInt(partes[2].split("\\(")[0]);
+                    int rs1 = getNum(partes[2].split("\\(")[1].replace(")", ""));
+                    registradores[rd] = memoria[registradores[rs1] + offset];
+                    break;
+                }
+                case "sw": {
+                    int rs2 = getNum(partes[1]);
+                    int offset = Integer.parseInt(partes[2].split("\\(")[0]);
+                    int rs1 = getNum(partes[2].split("\\(")[1].replace(")", ""));
+                    memoria[registradores[rs1] + offset] = registradores[rs2];
+                    break;
+                }
+                default:
+                    System.out.println("Instrução inválida: " + op);
+                    break;
+            }
+
+            pc++;
+        }
+
+        System.out.println("Registradores:");
+        for (int i = 0; i < registradores.length; i++) {
+            System.out.println("r" + i + ": " + registradores[i]);
+        }
+
+        System.out.println("\nMemória:");
+        for (int i = 0; i < memoria.length; i++) {
+            System.out.println(i + ": " + memoria[i]);
+        }
+    }
+
+    private int getNum(String r) {
+        return Integer.parseInt(r.replace("r", ""));
+    }
+}
+
+📝 Conclusão
+
+Sim, você não precisa usar classes model nem um parser separado. A abordagem com vetores e strings funciona bem, especialmente se:
+
+    Seu projeto é limitado em escopo (sem instruções extras como REV, AVG).
+
+    Você quer focar na lógica do pipeline, não na arquitetura do software.
+
+Se quiser, posso te ajudar agora a adaptar isso para incluir o pipeline (IF → ID → EX → MEM → WB) mantendo essa simplicidade.
+
+Você quer continuar com o pipeline agora ou fazer mais testes de instruções básicas primeiro?
+Você disse:
+como que funcina a logica de diferentes estagios do pipline cuidadr de diferentes pedaços da instrução ao mesmo tempo?
+O ChatGPT disse:
+
+Excelente pergunta! Isso é o coração de como um pipeline funciona: ele permite que várias instruções sejam executadas ao mesmo tempo, cada uma em um estágio diferente.
+
+Vamos entender isso com uma analogia e depois com um exemplo técnico real.
+🧠 O que é um pipeline?
+
+Um pipeline é como uma linha de produção. Em vez de esperar uma instrução terminar completamente para começar a próxima, a CPU começa a próxima assim que o primeiro estágio da anterior é liberado.
+📦 Analogia: Linha de Montagem
+
+Imagine uma fábrica de carros com 5 etapas:
+
+    IF – Pega o chassi
+
+    ID – Monta o motor
+
+    EX – Instala rodas
+
+    MEM – Pinta
+
+    WB – Coloca o logo
+
+Sem pipeline:
+
+    Cada carro só começa quando o anterior termina todas as 5 etapas → lento
+
+Com pipeline:
+
+    A cada novo passo, um novo carro entra na linha:
+
+    Tempo      IF    ID    EX   MEM   WB
+    -------------------------------------
+    Ciclo 1    C1
+    Ciclo 2    C2    C1
+    Ciclo 3    C3    C2    C1
+    Ciclo 4    C4    C3    C2   C1
+    Ciclo 5    C5    C4    C3   C2    C1
+
+💻 Pipeline RISC de 5 Estágios
+
+    IF (Instruction Fetch): busca a próxima instrução da memória
+
+    ID (Instruction Decode): decodifica a instrução e lê os registradores
+
+    EX (Execute): realiza a operação (soma, subtração, etc.)
+
+    MEM (Memory Access): acessa memória (LW/SW)
+
+    WB (Write Back): escreve o resultado no registrador
+
+🧪 Exemplo Técnico
+
+Vamos ver um conjunto de 3 instruções simples:
+
+add r1 r2 r3
+sub r4 r1 r5
+lw r6 0(r4)
+
+Como o pipeline trata isso?
+Ciclo	Estágio IF	Estágio ID	Estágio EX	Estágio MEM	Estágio WB
+1	add				
+2	sub	add			
+3	lw	sub	add		
+4	próxima	lw	sub	add	
+5		próxima	lw	sub	add
+6			próxima	lw	sub
+7				próxima	lw
+
+Observe que:
+
+    A primeira instrução (add) só é concluída no ciclo 5.
+
+    Mas a terceira instrução (lw) já está sendo executada no ciclo 5 também — em outro estágio.
+
+Isso é o poder do pipeline: várias instruções estão sendo processadas simultaneamente, mas cada uma em seu estágio.
+🛠️ Na prática (no seu simulador)
+
+Você precisa criar "buffers" entre estágios, por exemplo:
+
+String[] if_id = new String[...];  // Instrução que saiu do IF e vai para ID
+String[] id_ex = new String[...];  // Instrução que saiu do ID e vai para EX
+// etc.
+
+E cada ciclo você faz isso:
+
+    O estágio WB finaliza a instrução do ciclo anterior.
+
+    O estágio MEM passa o resultado para WB.
+
+    O estágio EX calcula o resultado da instrução vinda do ID.
+
+    O estágio ID decodifica a próxima instrução.
+
+    O estágio IF busca a próxima da memória.
+
+Tudo isso acontece no mesmo ciclo, como uma linha de produção.
+❗ Desafios do Pipeline
+
+O pipeline é rápido, mas tem problemas típicos:
+1. Data Hazards (Dependência de dados)
+
+add r1 r2 r3
+sub r4 r1 r5  // depende de r1, que só será calculado depois
+
+→ Solução: stalls, forwarding, ou reorganizar instruções
+2. Control Hazards (Instruções de desvio, loops, etc.)
+
+→ Não é um problema no seu projeto se você não tiver beq, jmp, etc.
+✅ Conclusão
+
+    Pipeline permite que várias instruções sejam executadas ao mesmo tempo, cada uma em um estágio diferente.
+
+    Você precisa pensar ciclo a ciclo, movimentando instruções de um estágio para o próximo.
+
+    Funciona como uma linha de produção contínua, onde o trabalho é dividido em partes.
+
+Se quiser, posso te mostrar como implementar isso em código simples com arrays e sem usar modelos. Quer ver um exemplo básico de pipeline em Java com 3 instruções?
+Você disse:
+resuma tudo ate agora
+O ChatGPT disse:
+
+Claro! Aqui está um resumo direto e organizado do que discutimos até agora sobre o seu projeto de simulador de pipeline RISC de 5 estágios em Java, com as suas preferências e decisões:
+✅ Objetivo do Projeto
+
+Criar um simulador em Java de um processador RISC com pipeline de 5 estágios, executando instruções básicas:
+
+    add, sub, lw, sw
+
+    (Você optou por não implementar os operadores desafio como rev, avg, swap)
+
+✅ Requisitos e Decisões Tomadas
+Item	Sua Decisão
+Linguagem	Java
+Entrada por arquivos	Sim: instructions.txt, registers.txt, memory.txt
+Classes auxiliares (model)	❌ Não usará classes como Instruction, RegisterFile, etc.
+Parser separado	❌ Não usará um parser separado
+Memória e registradores	Vetores simples: int[] memoria, int[] registradores
+Leitura dos arquivos	Será feita diretamente no Main.java
+Instruções desafiadoras	❌ Não serão implementadas
+✅ Pipeline de 5 Estágios
+
+Você seguirá os estágios clássicos do pipeline:
+Estágio	Nome	Função principal
+IF	Instruction Fetch	Busca a instrução na memória de instruções
+ID	Instruction Decode	Decodifica e lê registradores
+EX	Execute	Executa operação (soma, sub, endereço...)
+MEM	Memory Access	Acessa memória (para LW/SW)
+WB	Write Back	Escreve resultado no registrador
+
+A cada ciclo, você executa os 5 estágios com instruções diferentes, em paralelo.
+✅ Como vai funcionar (estrutura simples)
+Instruções
+
+    Lidas como linhas de texto (List<String>)
+
+    Exemplo: add r1 r2 r3
+
+Registradores
+
+    Vetor de inteiros: int[] registradores = new int[32];
+
+Memória
+
+    Vetor de inteiros: int[] memoria = new int[tamanho]; (pode ser 1024, por exemplo)
+
+✅ Pipeline na prática (exemplo de ciclo)
+
+Você usará buffers entre os estágios, algo como:
+
+String if_id_instrucao;
+String id_ex_instrucao;
+String ex_mem_instrucao;
+String mem_wb_instrucao;
+
+E no loop do simulador:
+
+while (...) {
+    WB();     // finaliza instrução
+    MEM();    // acessa memória
+    EX();     // executa operação
+    ID();     // decodifica
+    IF();     // busca próxima
+    avançaPC();
+}
+
+✅ Próximos Passos
+
+Você pode agora:
+
+    Criar os buffers entre estágios
+
+    Implementar a lógica de cada estágio como métodos
+
+    Usar List<String> para instruções e int[] para registradores/memória
+
+    Criar o loop do pipeline no Simulador.java
+
+Se quiser, posso:
+
+    Ajudar a montar o esqueleto do Simulador.java com os 5 estágios
+
+    Mostrar um exemplo de como mover instruções entre os buffers a cada ciclo
+
+Deseja que eu monte esse exemplo agora?
+Você disse:
+por que o loop funciona de cabeça para baixo?
+O ChatGPT disse:
+
+Boa pergunta — e ela mostra que você está realmente pensando como alguém que entende o funcionamento interno de um pipeline. O que você chamou de "loop de cabeça para baixo" é justamente a ordem inversa de execução dos estágios no loop:
+
+while (...) {
+    WB();     // último estágio
+    MEM();    // penúltimo
+    EX();     // ...
+    ID();     
+    IF();     // primeiro estágio
+}
+
+👉 Mas por que essa ordem é "invertida"?
+🧠 A resposta: porque cada estágio consome os dados do estágio anterior no mesmo ciclo
+
+Em um pipeline, o que um estágio faz depende do que o estágio anterior produziu no ciclo anterior. Logo, no ciclo atual, você precisa:
+
+    Terminar os estágios que estão mais à frente no pipeline (como WB, MEM, etc.)
+
+    Depois processar os estágios iniciais, que vão gerar dados novos para o próximo ciclo.
+
+🛠️ Se você fizesse o contrário (de IF → WB), teria problemas:
+
+Imagine isso:
+
+IF();  // busca uma nova instrução e coloca no buffer IF/ID
+ID();  // já lê esse buffer que acabou de ser atualizado!
+
+Ou seja: o ID estaria lendo dados do mesmo ciclo, e não do ciclo anterior. Isso quebra a lógica do pipeline.
+✔️ A solução correta:
+
+Processar do final para o início, porque:
+
+    WB trabalha com dados que foram produzidos no ciclo anterior por MEM
+
+    MEM trabalha com dados que foram produzidos por EX, e assim por diante
+
+Cada estágio consome dados de seu buffer anterior, escreve no buffer seguinte, e deve fazer isso antes que o estágio anterior o sobrescreva no mesmo ciclo.
+🔁 Fluxo correto do pipeline no tempo
+
+Digamos que ID() leia do buffer if_id, e escreva no id_ex.
+
+Se você fizer:
+
+IF();  // atualiza if_id
+ID();  // lê if_id (mas já foi sobrescrito!)
+
+O ID vai trabalhar com uma instrução errada — ela foi colocada lá no mesmo ciclo, e não veio do anterior.
+
+Por isso a ordem deve ser:
+
+WB();  // trabalha com dados "congelados" do ciclo anterior
+MEM();
+EX();
+ID();
+IF();  // coloca dados novos para o ciclo seguinte
+
+✅ Conclusão
+
+A ordem “de cabeça para baixo” (WB → IF) é necessária porque:
+
+    Cada estágio depende dos dados produzidos pelo anterior no ciclo anterior
+
+    Se fizer IF antes de ID no mesmo ciclo, você sobrescreve os dados que ID deveria usar
+
+    Processar de trás para frente garante que os dados corretos sejam usados antes de serem atualizados
+
+Se quiser, posso mostrar como montar os buffers entre estágios corretamente para refletir isso. Deseja seguir por essa parte agora?
+Você disse:
+seria mais simples fazer sem o buffer? como que funciona a contagem do loop?
+O ChatGPT disse:
+
+Ótima dúvida novamente! Vamos por partes:
+🧠 1. É possível fazer sem buffers entre os estágios?
+
+Tecnicamente, não, se você quer simular o comportamento real de um pipeline com instruções em paralelo.
+
+🔁 O buffer entre estágios é necessário porque:
+
+    Cada estágio precisa guardar os resultados que serão usados pelo próximo estágio no ciclo seguinte.
+
+    Sem buffers, você não teria como manter várias instruções em processamento ao mesmo tempo.
+
+💡 Mas: se seu objetivo é simular apenas um estágio por vez (sem paralelismo real), ou seja, 1 instrução passando pelos 5 estágios sozinha, então sim, você pode fazer sem buffers — mas isso não será uma simulação de pipeline, será uma simulação sequencial.
+✅ Comparação
+Abordagem	Tem paralelismo?	Usa buffers?	É mais simples?	É pipeline real?
+Sem buffers, sequencial	❌ Não	❌ Não	✅ Sim	❌ Não
+Com buffers, instruções em paralelo	✅ Sim	✅ Sim	❌ Mais complexa	✅ Sim
+🕒 2. Como funciona a contagem do loop (pipeline)?
+
+Quando você simula um pipeline, a contagem de ciclos precisa considerar:
+
+    O número de instruções
+
+    Mais o tempo para “esvaziar” o pipeline
+
+Exemplo: 3 instruções
+
+Cada instrução precisa de 5 estágios:
+Ciclo	IF	ID	EX	MEM	WB
+1	I1				
+2	I2	I1			
+3	I3	I2	I1		
+4		I3	I2	I1	
+5			I3	I2	I1
+6				I3	I2
+7					I3
+
+➡️ Resultado: Para 3 instruções, leva 7 ciclos:
+
+    3 para preencher o pipeline
+
+    4 para esvaziar
+
+Fórmula geral:
+
+Total de ciclos = n_instruções + 4
+
+🧮 Como controlar isso no código?
+
+Você pode fazer:
+
+int ciclo = 0;
+int totalInstrucoes = instrucoes.size();
+int totalCiclos = totalInstrucoes + 4; // para esvaziar pipeline
+
+while (ciclo < totalCiclos) {
+    WB();
+    MEM();
+    EX();
+    ID();
+    IF();
+    ciclo++;
+}
+
+E você usa buffers como:
+
+String if_id_instrucao;
+String id_ex_instrucao;
+// etc.
+
+A cada ciclo, você move o conteúdo entre eles.
+✅ Conclusão
+
+    ❌ Sem buffers: você só consegue simular instruções sequenciais, sem paralelismo → mais simples, mas não é pipeline real.
+
+    ✅ Com buffers: você simula instruções sobrepostas corretamente → mais fiel, mas mais complexo.
+
+    O loop do pipeline deve ter n + 4 ciclos.
+
+    A ordem WB → MEM → EX → ID → IF é necessária para manter os dados consistentes.
+
+Se quiser, posso te mostrar um exemplo mínimo com buffers e 3 instruções rodando em pipeline real. Quer isso?
+Você disse:
+por que o loop do pipeline conta de 4 em 4
+O ChatGPT disse:
+
+Ótimo! Essa confusão é bem comum no início — mas na verdade, o loop do pipeline não conta de 4 em 4.
+
+O que acontece é que, para um pipeline de 5 estágios (IF, ID, EX, MEM, WB), mesmo se você tiver só 1 instrução, ela leva 5 ciclos para ser completada — 1 ciclo por estágio.
+📌 Então, por que "soma 4"?
+
+Porque ao simular instruções em pipeline, você está lidando com instruções sobrepostas.
+Exemplo simples: 3 instruções
+Ciclo	IF	ID	EX	MEM	WB
+1	I1				
+2	I2	I1			
+3	I3	I2	I1		
+4		I3	I2	I1	
+5			I3	I2	I1
+6				I3	I2
+7					I3
+
+🔢 Repare:
+
+    I1 começa no ciclo 1, termina no ciclo 5.
+
+    I2 começa no ciclo 2, termina no ciclo 6.
+
+    I3 começa no ciclo 3, termina no ciclo 7.
+
+Portanto:
+🧠 Fórmula:
+
+    Total de ciclos = número de instruções + número de estágios - 1
+
+Para pipeline de 5 estágios:
+
+    Ciclos = n + 4
+
+Por isso falamos de “somar 4”:
+
+    Não é que o loop conte de 4 em 4.
+
+    É que você precisa rodar 4 ciclos a mais do que o número de instruções, para esvaziar o pipeline.
+
+🧪 Exemplo com 10 instruções
+
+int numInstrucoes = 10;
+int ciclos = numInstrucoes + 4; // pipeline de 5 estágios → +4
+
+for (int ciclo = 1; ciclo <= ciclos; ciclo++) {
+    WB();
+    MEM();
+    EX();
+    ID();
+    IF();
+}
+
+✅ Conclusão
+
+    O pipeline roda um estágio por ciclo.
+
+    Mas como as instruções entram em cascata (uma por ciclo), o pipeline termina só depois de "esvaziar" os estágios restantes.
+
+    Você soma 4 porque há 4 instruções pendentes nos estágios depois da última IF.
+
+Se quiser, posso te mostrar isso visualmente com um exemplo passo a passo, ou até em código. Deseja isso?
+Você disse:
+meu professor fez um loop q conta de 4 em 4. ou eu to doido
+O ChatGPT disse:
+
+Você não está doido! Pode ser que seu professor tenha usado um loop que incrementa de 4 em 4 por algum motivo específico — talvez uma forma simplificada ou uma abordagem particular para acelerar a simulação ou focar só em certos ciclos.
+
+Mas, na lógica real do pipeline, o contador normalmente aumenta de 1 em 1, porque:
+
+    Cada ciclo do pipeline processa todos os 5 estágios em paralelo, mas sequencialmente na simulação (WB → IF).
+
+    Você precisa simular cada ciclo para mover as instruções entre os estágios corretamente.
+
+Possíveis razões do loop contar de 4 em 4 no código do seu professor:
+
+    Simulação parcial ou simplificada
+    Talvez ele esteja simulando só os ciclos em que um estágio específico termina ou começa — pulando os ciclos intermediários para acelerar.
+
+    Simulação por “blocos”
+    Pode ser que ele agrupe ciclos de 5 em 5 ou 4 em 4 para rodar o pipeline por “etapas”, processando vários estágios de uma vez só, para facilitar o código.
+
+    Incremento no índice do programa (PC)
+    O incremento pode ser relacionado ao ponteiro de instrução (PC), que pode pular instruções de 4 em 4 bytes (tamanho da instrução), e não necessariamente o ciclo do pipeline.
+
+Resumo rápido
+Incremento no loop	Pode ser um incremento em 1 ciclo ou mais ciclos simultâneos
+Incremento de 1	Simula passo a passo cada ciclo do pipeline
+Incremento de 4 (ou n)	Pode ser simplificação, salto no PC, ou agrupamento de ciclos
+
+Se quiser, posso te ajudar a entender o código do seu professor — é só enviar ele aqui! Assim a gente vê exatamente o que está acontecendo com esse loop “de 4 em 4”. Quer?
+Você disse:
+acho q ele usou uma classe pc
+O ChatGPT disse:
+
+Ah, isso faz bastante sentido! O PC (Program Counter) normalmente avança de 4 em 4 bytes em arquiteturas RISC, porque cada instrução tem 4 bytes (32 bits). Então:
+
+    O PC aponta para o endereço da próxima instrução na memória.
+
+    Como cada instrução ocupa 4 bytes, para ir para a próxima instrução o PC é incrementado por 4.
+
+Então, o que seu professor fez provavelmente foi:
+
+    Um loop que incrementa o PC de 4 em 4 para buscar a próxima instrução.
+
+    Esse incremento é diferente do contador de ciclos do pipeline, que normalmente incrementa de 1 em 1.
+
+Exemplo prático:
+
+int PC = 0;
+
+while (PC < tamanhoMemoria) {
+    // Busca instrução na memória no endereço PC
+    String instrucao = memoriaInstrucoes[PC / 4]; // índice da instrução
+    
+    // Executa pipeline para essa instrução
+    
+    PC += 4; // Avança para a próxima instrução
+}
+
+Aqui:
+
+    PC vai de 0, 4, 8, 12, ...
+
+    Mas o loop do pipeline (que simula os estágios) pode rodar de 1 em 1 ciclo, independente do PC.
+
+Resumo
+Contador de ciclo do pipeline	Incrementa normalmente +1 por ciclo
+PC (Program Counter)	Incrementa +4 para ir para a próxima instrução
+
+Se quiser, posso te ajudar a montar o exemplo do PC com o pipeline todo funcionando. Quer?
+Você disse:
+faça algo similar um fluxograma que inclua tudo que discutimos ate agora
+O ChatGPT disse:
+
+Claro! Vou criar um fluxograma textual estruturado que inclui tudo que falamos até agora sobre o pipeline RISC, funcionamento, buffers, PC, e contagem de ciclos.
+Fluxograma Textual do Simulador Pipeline RISC
+
+Início
+  |
+  |--> [Leitura dos arquivos]
+  |       - Carregar memória (vetor int[])
+  |       - Carregar registradores (vetor int[])
+  |       - Carregar instruções (List<String>)
+  |
+  |--> Inicializar variáveis:
+  |       - PC = 0 (program counter)
+  |       - Buffers de pipeline: IF/ID, ID/EX, EX/MEM, MEM/WB
+  |       - Ciclo = 0
+  |       - TotalCiclos = numInstrucoes + 4
+  |
+  |--> Enquanto Ciclo < TotalCiclos:
+  |         |
+  |         |--> Executar estágios do pipeline na ordem inversa:
+  |                 1) WB()   -> escreve resultado no registrador
+  |                 2) MEM()  -> acessa memória para LW/SW
+  |                 3) EX()   -> executa operação (ADD, SUB, cálculo de endereço)
+  |                 4) ID()   -> decodifica instrução, lê registradores
+  |                 5) IF()   -> busca instrução na memória usando PC
+  |         
+  |         |--> Atualizar buffers entre estágios
+  |         |--> Incrementar Ciclo += 1
+  |         |--> Incrementar PC += 4 (pula para próxima instrução)
+  |
+  |--> Fim do loop
+  |
+  |--> Mostrar resultados e estatísticas
+  |
+Fim
+
+Detalhes importantes no fluxo
+1. Por que o loop executa os estágios na ordem inversa?
+
+    Para garantir que cada estágio consuma dados do ciclo anterior e só depois os atualize para o próximo estágio.
+
+    Evita que dados sejam sobrescritos no mesmo ciclo.
+
+2. Por que PC incrementa de 4 em 4?
+
+    Cada instrução tem 4 bytes.
+
+    PC aponta para o endereço da próxima instrução na memória.
+
+3. Buffers entre estágios
+
+    Servem para armazenar dados/intermediários entre estágios.
+
+    Permitem que múltiplas instruções estejam em diferentes estágios simultaneamente (paralelismo).
+
+4. Contagem de ciclos
+
+    Total de ciclos = número de instruções + 4 (para esvaziar o pipeline de 5 estágios).
+
+    Cada ciclo executa todos os 5 estágios, simulando a execução paralela.
+
+Se quiser, posso criar um fluxograma visual (imagem) ou um código exemplo para essa lógica! Quer?
+
+Se quiser, posso gerar um arquivo .txt pronto para você baixar, só me avisa! Quer?
+
+
+O ChatGPT pode cometer erros. Considere verificar informações importantes.
