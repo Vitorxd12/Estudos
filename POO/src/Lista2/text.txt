@@ -1,0 +1,82 @@
+
+3-
+import java.util.function.Predicate;
+import java.util.function.Consumer;
+//screva um m´etodo executarSe(Predicate<Integer> cond, Consumer<Integer> acao, int valor) que executa a a¸c˜ao apenas se o predicado for verdadeiro. Teste com: n > 10 e System.out.println(n * 2)
+public class Main{
+	public static void executarSe(Predicate<Integer> cond, int valor, Consumer<Integer> acao){
+        if(cond.test(valor)){
+        	acao.accept(valor);
+        } else {
+        	System.out.println("acao não realizada");
+        }
+    }
+	public static void main(String[] args) {
+    	int valor = 10;
+    	Predicate<Integer> cond = n -> n>10;
+        Consumer<Integer> acao = n -> System.out.println(n*2);
+		executarSe(cond, valor, acao);
+	}
+}
+4- incompleta
+import java.util.function.Predicate; //test
+import java.util.function.Consumer; //aceppt
+import java.util.function.Function; //apply
+import java.util.function.UnaryOperator; //apply
+//4. Crie um UnaryOperator<String> que adicione prefixo ”Sr. ”apenas se o nome n˜ao estiver
+//vazio. Use tern´ario na lambda. Teste com trˆes nomes.
+
+public class Main{
+	public static void main(String[] args) {
+		UnaryOperator<String> prefixador = s -> (s.length() > 0 ? "Sr.  "+ s  : s);
+        System.out.println(prefixador.apply(""));
+	}
+}
+6-
+import java.util.function.Predicate; //test
+import java.util.function.Consumer; //aceppt
+import java.util.function.Function; //apply
+import java.util.function.UnaryOperator; //apply
+
+//6. Implemente um m´etodo aplicarOperacao(int[] numeros, UnaryOperator<Integer>
+//op) que retorna um novo array com todos os elementos modificados pela fun¸c˜ao. Teste
+//com um operador que triplica cada n´umero.
+
+public class Main{
+	public static int[] aplicarOperacao(int[] numeros, UnaryOperator<Integer> op){
+    	int[] novaLista = new int[numeros.length];
+        for(int i = 0; i < numeros.length; i++){
+        	novaLista[i] = op.apply(numeros[i]);
+        }
+        return novaLista;
+    }
+	public static void main(String[] args) {
+    	int[] numeros = {1, 2, 3};
+        UnaryOperator<Integer> triplicar = n -> n*3;
+        numeros = aplicarOperacao(numeros, triplicar);
+        for(int i = 0; i < numeros.length; i++){
+        	System.out.println(numeros[i]);
+        }
+
+	}
+}
+7-
+import java.util.function.Predicate; //test
+import java.util.function.Consumer; //aceppt
+import java.util.function.Function; //apply
+import java.util.function.UnaryOperator; //apply
+import java.util.function.BiFunction;
+
+//7. Crie um BiFunction<Double, Double, Boolean> que recebe peso e altura e verifica se
+//o IMC ´e maior que 25. Mostre a mensagem “Sobrepeso” ou “Peso ok” com base no
+//resultado
+
+public class Main{
+	public static void main(String[] args) {
+    	BiFunction<Double, Double, Boolean> calcIMC = (altura, peso) -> peso/(altura*altura) > 25;
+		double altura = 1.74, peso = 80.0;
+        System.out.println(calcIMC.apply(altura, peso) ? "gordo" : "magro");
+	}
+}
+
+
