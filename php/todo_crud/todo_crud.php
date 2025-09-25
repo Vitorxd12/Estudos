@@ -1,7 +1,7 @@
 <?php
     $host = "localhost";
     $user = "root";
-    $senha = "senha123";
+    $senha = "root";
     $banco = "todo_list";
 
     //conexão - criando um novo objeto da classe mysqli do php com os parâmetros de conexão
