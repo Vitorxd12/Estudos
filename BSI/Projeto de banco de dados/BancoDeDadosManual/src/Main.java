@@ -12,9 +12,10 @@ public class Main {
 
         while (opcao != 0) {
             System.out.println("\n--- MENU DE GERENCIAMENTO ---");
-            System.out.println("1. Listar / Buscar Usuário");
+            System.out.println("1. Buscar Usuário");
             System.out.println("2. Adicionar Novo Usuário");
             System.out.println("3. Remover Usuário");
+            System.out.println("4. Listar Todos os Usuários");
             System.out.println("0. Sair");
             System.out.print("Escolha uma opção: ");
 
@@ -47,7 +48,9 @@ public class Main {
                     String nomeRemover = scanner.nextLine();
                     services.removerUsuario(nomeRemover);
                     break;
-
+                case 4:
+                    services.listarUsuarios();
+                    break;
                 case 0:
                     System.out.println("Encerrando o sistema... Até logo!");
                     break;

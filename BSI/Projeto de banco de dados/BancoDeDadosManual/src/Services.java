@@ -28,6 +28,19 @@ public class Services {
         }
     }
 
+    public void listarUsuarios() {
+        if (usuarios.isEmpty()) {
+            System.out.println("Nenhum usuário cadastrado.");
+            return;
+        }
+        System.out.println("\n--- Lista de Usuários ---");
+        int contador = 0;
+        for (Usuario usuario : usuarios) {
+            contador++;
+            System.out.println(contador + "- Nome: " + usuario.getNome() + ", Email: " + usuario.getEmail() + ", Telefone: " + usuario.getTelefone());
+        }
+        System.out.println("-------------------------\n");
+    }
     public ArrayList<Usuario> buscarUsuario(String busca) {
         if (busca.length() < 3) {
             System.out.println("A busca deve conter pelo menos 3 caracteres.");
