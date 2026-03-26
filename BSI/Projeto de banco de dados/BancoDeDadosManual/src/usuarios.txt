@@ -1,2 +1,10 @@
-
-vitor,vitor@mail,(79) 99999-9999
+João Silva,joao.silva@email.com,(11) 99999-9999
+Maria Oliveira,maria.oliveira@email.com,(21) 98888-8888
+Carlos Souza,carlos.souza@email.com,(31) 97777-7777
+Ana Pereira,ana.pereira@email.com,(11) 96666-6666
+Pedro Santos,pedro.santos@email.com,(41) 95555-5555
+Luiza Costa,luiza.costa@email.com,(11) 94444-4444
+Rafael Almeida,rafael.almeida@email.com,(51) 93333-3333
+Fernanda Lima,fernanda.lima@email.com,(11) 92222-2222
+Lucas Mendes,lucas.mendes@email.com,(61) 91111-1111
+Juliana Rocha,juliana.rocha@email.com,(11) 90000-0000
